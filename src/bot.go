@@ -14,7 +14,8 @@ import (
 )
 
 type Bot struct {
-	session *discordgo.Session
+	session            *discordgo.Session
+	registeredCommands []*discordgo.ApplicationCommand
 }
 
 // Initializes bot instance and applies the required configurations
@@ -48,23 +49,28 @@ func (b *Bot) Start() {
 		log.Fatal("Failed to open session: ", err)
 	}
 
-	for _, c := range commands.All {
-		_, err = b.session.ApplicationCommandCreate(b.session.State.User.ID, "", c.Command)
+	b.registeredCommands = make([]*discordgo.ApplicationCommand, len(commands.All))
+	for i, c := range commands.All {
+		registered, err := b.session.ApplicationCommandCreate(b.session.State.User.ID, "", c.Command)
 		if err != nil {
 			log.Panicf("Failed to register command \"%v\": %v", c.Command.Name, err)
 		}
+		b.registeredCommands[i] = registered
 	}
 }
 
 // Closes websocket connection to Discord
 func (b *Bot) Close() {
+	log.Println("Shutting down...")
 	b.session.Close()
-	for _, c := range commands.All {
-		err := b.session.ApplicationCommandDelete(b.session.State.User.ID, "", c.Command.ID)
+	for _, c := range b.registeredCommands {
+		err := b.session.ApplicationCommandDelete(b.session.State.User.ID, "", c.ID)
 		if err != nil {
-			log.Panicf("Failed to delete command \"%v\": %v", c.Command.Name, err)
+			log.Panicf("Failed to delete command \"%v\": %v", c.Name, err)
 		}
 	}
+	b.registeredCommands = []*discordgo.ApplicationCommand{}
+	log.Println("Shut down completed.")
 }
 
 // Instructs the current process to wait for future events from Discord.
@@ -73,6 +79,7 @@ func (b *Bot) Await() {
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
 	<-stop
+	log.Println("Received shutting signal.")
 }
 
 // Configures discordgo to use user-specified proxy URL for it's connections

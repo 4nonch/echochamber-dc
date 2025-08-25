@@ -11,7 +11,6 @@ var (
 	All = []*Command{
 		StatusCommand,
 	}
-
 	Handlers = allCommandHandlers()
 )
 

@@ -13,13 +13,12 @@ type Config struct {
 }
 
 func LoadConfig() *Config {
-	c := &Config{
+	return &Config{
 		BotToken:  getEnv("BOT_TOKEN"),
 		GuildID:   getEnv("GUILD_ID"),
 		ChannelID: getEnv("CHANNEL_ID"),
 		ProxyUrl:  getEnv("PROXY_URL", ""),
 	}
-	return c
 }
 
 func getEnv(lookup string, defaultValue ...string) string {
