@@ -3,6 +3,7 @@ package commands
 import (
 	"log"
 
+	"github.com/4nonch/echochamber-dc/src/actions"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -25,5 +26,6 @@ var StatusCommand = &Command{
 }
 
 func onStatusCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	actions.SendInteractionMessage("Status successfully triggered.", s, i)
 	log.Println("\"Status\" Command Triggered")
 }
