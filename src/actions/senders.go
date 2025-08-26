@@ -20,3 +20,10 @@ func SendInteractionMessage(content string, s *discordgo.Session, i *discordgo.I
 		log.Printf("Failed to send interaction message \"%v\": %v", content, err)
 	}
 }
+
+func SendMessage(content string, s *discordgo.Session, m *discordgo.MessageCreate) {
+	_, err := s.ChannelMessageSend(m.ChannelID, content)
+	if err != nil {
+		log.Printf("Failed to send message \"%v\": %v", content, err)
+	}
+}

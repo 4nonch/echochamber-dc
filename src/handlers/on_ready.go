@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"log"
-	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -16,12 +15,4 @@ func OnReady(_ *discordgo.Session, r *discordgo.Ready) {
 		r.SessionID,
 		r.Version,
 	)
-
-	guilds := make([]string, len(r.Guilds))
-	for i, g := range r.Guilds {
-		guilds[i] = g.Name
-	}
-	if guilds[0] != "" {
-		log.Print("Available guilds: ", strings.Join(guilds, ","))
-	}
 }

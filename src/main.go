@@ -1,9 +1,12 @@
 package main
 
+import (
+	"github.com/4nonch/echochamber-dc/src/bot"
+)
+
 func main() {
-	config := LoadConfig()
-	bot := NewBot(config)
-	bot.Start()
-	bot.Await()
-	bot.Close()
+	b := bot.NewBot()
+	b.Start()
+	b.Await()
+	b.Close()
 }
