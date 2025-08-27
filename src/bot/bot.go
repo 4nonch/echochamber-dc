@@ -2,8 +2,6 @@ package bot
 
 import (
 	"log"
-	"net/http"
-	"net/url"
 	"os"
 	"os/signal"
 
@@ -11,7 +9,6 @@ import (
 	"github.com/4nonch/echochamber-dc/src/handlers"
 	"github.com/4nonch/echochamber-dc/src/vars"
 	"github.com/bwmarrin/discordgo"
-	"github.com/gorilla/websocket"
 )
 
 type Bot struct {
@@ -37,10 +34,8 @@ func NewBot() *Bot {
 	handlers.Register(session)
 
 	bot := &Bot{session: session}
-
-	if vars.ProxyUrl != "" {
-		bot.setupProxy(vars.ProxyUrl)
-	}
+	bot.session.Client = vars.Client
+	bot.session.Dialer = vars.Dialer
 
 	return bot
 }
@@ -83,29 +78,4 @@ func (b *Bot) Await() {
 	signal.Notify(stop, os.Interrupt)
 	<-stop
 	log.Println("Received shutting signal.")
-}
-
-// Configures discordgo to use user-specified proxy URL for it's connections
-// (useful for circumventing Discord blocks in third-world countries)
-func (b *Bot) setupProxy(proxyUrl string) {
-	proxy, err := url.Parse(proxyUrl)
-	if err != nil {
-		log.Fatalf(
-			"Failed to parse PROXY_URL \"%s\": %s",
-			proxyUrl,
-			err,
-		)
-	}
-	proxyFactory := http.ProxyURL(proxy)
-	client := &http.Client{
-		Transport: &http.Transport{
-			Proxy: proxyFactory,
-		},
-	}
-	dialer := &websocket.Dialer{
-		Proxy: proxyFactory,
-	}
-
-	b.session.Client = client
-	b.session.Dialer = dialer
 }
