@@ -44,6 +44,7 @@ jobs:
           echo "inside - OK"
           PROJECT_OWNER=4nonch;
           PROJECT_NAME=echochamber-dc;
+          GOLANG_VERSION=1.23.4;
           SECRETS='$SECRETS';
           BRANCH_NAME=master;
           eval $(cat deploy/deploy.sh)"

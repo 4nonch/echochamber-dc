@@ -5,6 +5,7 @@ ssh-keyscan github.com >> ~/.ssh/known_hosts
 # Required parameters:
 #   PROJECT_OWNER - Project's owner username
 #   PROJECT_NAME - Project's repository name
+#   GOLANG_VERSION - Project's golang version
 #   SECRETS - Project's secrets
 # Additional parameters
 #   PROJECT_SECRETS_NAME - Project's secrets filename
@@ -12,12 +13,13 @@ ssh-keyscan github.com >> ~/.ssh/known_hosts
 
 [[ -n $PROJECT_NAME ]] || exit 1
 [[ -n $PROJECT_OWNER ]] || exit 1
+[[ -n $GOLANG_VERSION ]] || exit 1
 
 PROJECT_DIR=/srv/$PROJECT_NAME
 PROJECT_LOG_BASE_DIR=/var/log/$PROJECT_NAME
 
 APPEND_DEPENDENCIES=(
-  golang
+  bison
   git
 )
 APPEND_LOG_DIRS=(
@@ -41,11 +43,23 @@ echo -e "Using public link to clone repository"
 GIT_REPOSITORY="https://github.com/${PROJECT_OWNER}/${PROJECT_NAME}.git"
 
 if ! git clone --branch $BRANCH_NAME "$GIT_REPOSITORY"; then
-   cd "$PROJECT_NAME" || exit 1
-   git pull origin $BRANCH_NAME
+  cd "$PROJECT_NAME" || exit 1
+  git pull origin $BRANCH_NAME
 else
   git config --global --add safe.directory "$PROJECT_DIR"
 fi
+
+# Installing GVM
+if ! command -v gvm &>/dev/null 2>&1; then
+  echo -e "Installing GVM"
+  bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+  source ~/.gvm/scripts/gvm
+fi
+
+# Installing proper golang version
+echo -e "Setting up go$GOLANG_VERSION"
+gvm install go$GOLANG_VERSION
+gvm use go$GOLANG_VERSION
 
 # Including utils
 . "$PROJECT_DIR"/deploy/deploy_utils.sh
@@ -60,9 +74,11 @@ useradd --no-create-home -d /nonexistent "$PROJECT_NAME"
 
 # Building binary
 echo -e "Build binary"
+cd $PROJECT_NAME
 rm -f "$PROJECT_DIR/binary"
 go build -ldflags="-s -w" -o "$PROJECT_DIR/binary" "$PROJECT_DIR/src/"
 chmod +x "$PROJECT_DIR/binary"
+cd ..
 
 # Creating directories
 echo -e "Create dirs"
