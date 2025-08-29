@@ -34,6 +34,7 @@ jobs:
         run: |
           SECRETS=$(echo ${PROD_SECRETS} ${PROD_VARS})
           SECRETS=$(echo $SECRETS | tr -d '\r')
+          SECRETS=$(echo $SECRETS | sed -e 's/ /\n/g')
           eval $(ssh-agent -s)
           echo "agent - OK"
           echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
