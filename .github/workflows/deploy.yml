@@ -5,45 +5,45 @@ on:
     branches:
       - master
 
-  concurrency:
-    group: master
-    cancel-in-progress: true
+concurrency:
+  group: master
+  cancel-in-progress: true
 
-  jobs:
-    deploy:
-      name: Deploy
-      runs-on: ubuntu-latest
-      environment: deploy
-      steps: 
-        - name: Checkout repository
-          uses: actions/checkout@v4
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: deploy
+    steps: 
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-        - name: Configure .ssh permissions
-          run: |
-            mkdir -p ~/.ssh
-            chmod 700 ~/.ssh
+      - name: Configure .ssh permissions
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
 
-        - name: Configure SSH & deploy
-          env:
-            SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-            SSH_HOST: ${{ secrets.SSH_HOST }}
-            SSH_PORT: ${{ secrets.SSH_PORT }}
-            SSH_USER: ${{ secrets.SSH_USER }}
-            PROD_SECRETS: ${{ secrets.PROD_SECRETS }}
-            PROD_VARS: ${{ vars.PROD_VARS }}
-          run: |
-            SECRETS=$(echo ${PROD_SECRETS} ${PROD_VARS})
-            SECRETS=$(echo $SECRETS | tr -d '\r')
-            eval $(ssh-agent -s)
-            echo "agent - OK"
-            echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-            echo "ssh-add - OK"
-            ssh-keyscan -p $SSH_PORT $SSH_HOST > ~/.ssh/known_hosts
-            echo "ssh-keyscan - OK"
-            ssh $SSH_USER@$SSH_HOST -p $SSH_PORT "
-            echo "inside - OK"
-            PROJECT_OWNER=4nonch;
-            PROJECT_NAME=echochamber-dc;
-            SECRETS='$SECRETS';
-            BRANCH_NAME=master;
-            eval $(cat deploy/deploy.sh)"
+      - name: Configure SSH & deploy
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          PROD_SECRETS: ${{ secrets.PROD_SECRETS }}
+          PROD_VARS: ${{ vars.PROD_VARS }}
+        run: |
+          SECRETS=$(echo ${PROD_SECRETS} ${PROD_VARS})
+          SECRETS=$(echo $SECRETS | tr -d '\r')
+          eval $(ssh-agent -s)
+          echo "agent - OK"
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+          echo "ssh-add - OK"
+          ssh-keyscan -p $SSH_PORT $SSH_HOST > ~/.ssh/known_hosts
+          echo "ssh-keyscan - OK"
+          ssh $SSH_USER@$SSH_HOST -p $SSH_PORT "
+          echo "inside - OK"
+          PROJECT_OWNER=4nonch;
+          PROJECT_NAME=echochamber-dc;
+          SECRETS='$SECRETS';
+          BRANCH_NAME=master;
+          eval $(cat deploy/deploy.sh)"
