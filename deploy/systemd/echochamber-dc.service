@@ -1,0 +1,15 @@
+[Unit]
+Description="echochamber-dc"
+After=network.target
+PartOf=echochamber-dc.target
+
+[Service]
+User=echochamber-dc
+Group=echochamber-dc
+Restart=always
+ExecStart=/srv/echochamber-dc/binary
+EnvironmentFile=/srv/echochamber-dc/.env
+StandardOutput=append:/var/log/echochamber-dc/systemd/echochamber-dc/echochamber-dc.log
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,7 @@
+[Unit]
+After=network.target
+
+Wants=echochamber-dc.service
+
+[Install]
+WantedBy=multi-user.target
