@@ -62,6 +62,7 @@ func RedirectMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		)
 		log.Println(errMsg)
 		SendMessage(errMsg, s, m)
+		return
 	}
 	sendSuccess(s, m)
 }
