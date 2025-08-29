@@ -74,11 +74,10 @@ useradd --no-create-home -d /nonexistent "$PROJECT_NAME"
 
 # Building binary
 echo -e "Build binary"
-cd $PROJECT_NAME
+cd $PROJECT_DIR
 rm -f "$PROJECT_DIR/binary"
 go build -ldflags="-s -w" -o "$PROJECT_DIR/binary" "$PROJECT_DIR/src/"
 chmod +x "$PROJECT_DIR/binary"
-cd ..
 
 # Creating directories
 echo -e "Create dirs"
