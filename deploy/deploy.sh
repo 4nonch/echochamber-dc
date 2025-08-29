@@ -58,7 +58,7 @@ fi
 
 # Installing proper golang version
 echo -e "Setting up go$GOLANG_VERSION"
-gvm install go$GOLANG_VERSION
+gvm install go$GOLANG_VERSION -B
 gvm use go$GOLANG_VERSION
 
 # Including utils
