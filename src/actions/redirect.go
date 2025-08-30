@@ -76,10 +76,10 @@ func prepareMessage(
 ) (ms *discordgo.MessageSend, failed bool) {
 	reference, content, err := extractReference(m.Content)
 	if errors.Is(err, errEmptyMessage) {
-		SendMessage(err.Error(), s, m)
+		SendMessage("Can't reply with an empty message.", s, m)
 		return nil, true
 	} else if err != nil {
-		msg := fmt.Sprintf("Failed to prepare message: \"%v\"", err)
+		msg := fmt.Sprintf("Failed to prepare message: %v", err)
 		log.Println(msg)
 		SendMessage(msg, s, m)
 		return nil, true
@@ -101,21 +101,27 @@ func extractReference(c string) (*discordgo.MessageReference, string, error) {
 	}
 
 	idx := strings.Index(data, "\n")
-	if idx == -1 {
-		return nil, c, nil
+	if idx != -1 {
+		data = c[:idx]
 	}
 
-	data = c[:idx]
 	matches := patterns.MessageLink.FindStringSubmatch(data)
-
 	if len(matches) == 0 {
 		return nil, c, nil
 	}
-
 	link := matches[0]
-	messageID := matches[1]
-	c = c[len(link):]
+	guildID := matches[1]
+	channelID := matches[2]
+	messageID := matches[3]
 
+	if guildID != vars.GuildID {
+		return nil, "", errors.New("Replied message lives on different guild.")
+	}
+	if channelID != vars.ChannelID {
+		return nil, "", errors.New("Replied message lives on different guild's channel.")
+	}
+
+	c = c[len(link):]
 	if strings.TrimSpace(c) == "" {
 		return nil, "", errEmptyMessage
 	}

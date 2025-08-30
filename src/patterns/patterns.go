@@ -5,5 +5,5 @@ import (
 )
 
 var (
-	MessageLink = regexp.MustCompile(`^https://discord\.com/channels/\d+/\d+/(\d+)$`)
+	MessageLink = regexp.MustCompile(`^https://discord\.com/channels/(\d+)/(\d+)/(\d+)$`)
 )
