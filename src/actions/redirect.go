@@ -1,22 +1,19 @@
 package actions
 
 import (
+	"errors"
 	"fmt"
 	"log"
+	"strings"
 
-	"github.com/4nonch/echochamber-dc/src/utils"
+	"github.com/4nonch/echochamber-dc/src/patterns"
 	"github.com/4nonch/echochamber-dc/src/vars"
 	"github.com/bwmarrin/discordgo"
 )
 
+// Errors
 var (
-	_successMsg = utils.MakeLocaleMap(
-		"Message successfully delivered.",
-		&utils.Localization{
-			Loc: discordgo.Russian,
-			Msg: "Сообщение успешно доставлено.",
-		},
-	)
+	errEmptyMessage = errors.New("Can't send an empty message.")
 )
 
 func RedirectMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -24,15 +21,17 @@ func RedirectMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	stream, failed := extractAttachments(s, m)
+	stream, failed := fetchAttachments(s, m)
 	if failed {
 		return
 	}
 
-	dm := &discordgo.MessageSend{}
-	dm.Content = m.Content
-	dm.Files = stream.Files
-	_, err := s.ChannelMessageSendComplex(vars.ChannelID, dm)
+	ms, failed := prepareMessage(s, m, stream.Files)
+	if failed {
+		return
+	}
+
+	_, err := s.ChannelMessageSendComplex(vars.ChannelID, ms)
 	stream.Close()
 
 	if err != nil {
@@ -47,14 +46,12 @@ func RedirectMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	SendMessage(utils.GetLocalized(_successMsg, discordgo.Locale(m.Author.Locale)), s, m)
+	SendMessage("Message successfully delivered.", s, m)
 }
 
 // Returns attachment files (if there is no one, Files attribute will be simply an empty slice).
-// If second error is true - then error occurred and notified
-func extractAttachments(s *discordgo.Session, m *discordgo.MessageCreate) (StreamFiles, bool) {
-	var stream StreamFiles
-
+// If second error is true - then error occurred and notified.
+func fetchAttachments(s *discordgo.Session, m *discordgo.MessageCreate) (stream StreamFiles, failed bool) {
 	if len(m.Attachments) == 0 {
 		return stream, false
 	}
@@ -69,4 +66,63 @@ func extractAttachments(s *discordgo.Session, m *discordgo.MessageCreate) (Strea
 		return stream, true
 	}
 	return stream, false
+}
+
+// If failed (error occurred) - handles all errors and returns "true" boolean
+func prepareMessage(
+	s *discordgo.Session,
+	m *discordgo.MessageCreate,
+	fs []*discordgo.File,
+) (ms *discordgo.MessageSend, failed bool) {
+	reference, content, err := extractReference(m.Content)
+	if errors.Is(err, errEmptyMessage) {
+		SendMessage(err.Error(), s, m)
+		return nil, true
+	} else if err != nil {
+		msg := fmt.Sprintf("Failed to prepare message: \"%v\"", err)
+		log.Println(msg)
+		SendMessage(msg, s, m)
+		return nil, true
+	}
+
+	return &discordgo.MessageSend{
+		Content:   content,
+		Files:     fs,
+		Reference: reference,
+	}, false
+}
+
+// Return MessageReference if original content contained a reply.
+// Link to the replied message will be removed from original content
+func extractReference(c string) (*discordgo.MessageReference, string, error) {
+	data := c
+	if len(data) > 100 {
+		data = c[:100]
+	}
+
+	idx := strings.Index(data, "\n")
+	if idx == -1 {
+		return nil, c, nil
+	}
+
+	data = c[:idx]
+	matches := patterns.MessageLink.FindStringSubmatch(data)
+
+	if len(matches) == 0 {
+		return nil, c, nil
+	}
+
+	link := matches[0]
+	messageID := matches[1]
+	c = c[len(link):]
+
+	if strings.TrimSpace(c) == "" {
+		return nil, "", errEmptyMessage
+	}
+
+	ref := &discordgo.MessageReference{
+		MessageID: messageID,
+		GuildID:   vars.GuildID,
+	}
+	return ref, c, nil
 }
