@@ -74,7 +74,7 @@ func prepareMessage(
 	m *discordgo.MessageCreate,
 	fs []*discordgo.File,
 ) (ms *discordgo.MessageSend, failed bool) {
-	reference, content, err := extractReference(m.Content)
+	reference, content, err := extractReference(m)
 	if errors.Is(err, errEmptyMessage) {
 		SendMessage("Can't reply with an empty message.", s, m)
 		return nil, true
@@ -94,7 +94,8 @@ func prepareMessage(
 
 // Return MessageReference if original content contained a reply.
 // Link to the replied message will be removed from original content
-func extractReference(c string) (*discordgo.MessageReference, string, error) {
+func extractReference(m *discordgo.MessageCreate) (*discordgo.MessageReference, string, error) {
+	c := m.Content
 	data := c
 	if len(data) > 100 {
 		data = c[:100]
@@ -122,7 +123,7 @@ func extractReference(c string) (*discordgo.MessageReference, string, error) {
 	}
 
 	c = c[len(link):]
-	if strings.TrimSpace(c) == "" {
+	if len(m.Attachments) == 0 && strings.TrimSpace(c) == "" {
 		return nil, "", errEmptyMessage
 	}
 
