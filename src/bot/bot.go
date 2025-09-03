@@ -28,7 +28,8 @@ func NewBot() *Bot {
 		discordgo.IntentGuilds |
 			discordgo.IntentDirectMessages |
 			discordgo.IntentGuildMessages |
-			discordgo.IntentGuildMembers,
+			discordgo.IntentGuildMembers |
+			discordgo.IntentGuildEmojis,
 	)
 
 	handlers.Register(session)
