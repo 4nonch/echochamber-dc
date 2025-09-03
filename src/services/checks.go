@@ -6,6 +6,7 @@ import (
 	"log"
 	"unicode/utf8"
 
+	"github.com/4nonch/echochamber-dc/src/actions"
 	"github.com/4nonch/echochamber-dc/src/vars"
 	"github.com/bwmarrin/discordgo"
 )
@@ -18,7 +19,7 @@ func CouldViewChannel(s *discordgo.Session, m *discordgo.MessageCreate) bool {
 		return true
 	}
 
-	perms, err := s.State.UserChannelPermissions(m.Author.ID, vars.ChannelID)
+	perms, err := actions.GetChannelPermissions(s, m.Author.ID)
 	if err == nil {
 		msg := fmt.Sprintf("Unable to get user's permissions for channel \"%s\": %v", vars.ChannelID, err)
 		log.Printf(msg)

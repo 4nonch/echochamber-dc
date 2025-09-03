@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"sync"
 
@@ -43,6 +44,7 @@ func GetChannelPermissions(s *discordgo.Session, userID string) (int64, error) {
 	if err == nil {
 		return perms, nil
 	}
+	log.Printf("GetChannelPermissions - API call instead of cache for user \"%s\"", userID)
 	perms, err = s.UserChannelPermissions(userID, vars.ChannelID)
 	return perms, err
 }
