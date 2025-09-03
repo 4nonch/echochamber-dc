@@ -7,6 +7,10 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+func init() {
+	handlers.add(OnMessageCreate)
+}
+
 func OnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.GuildID != "" ||
 		m.Author.ID == s.State.User.ID {

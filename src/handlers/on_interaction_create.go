@@ -7,6 +7,10 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+func init() {
+	handlers.add(OnInteractionCreate)
+}
+
 func OnInteractionCreate(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if i.Type != discordgo.InteractionApplicationCommand ||
 		i.GuildID != "" {

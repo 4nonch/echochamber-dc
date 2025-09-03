@@ -87,6 +87,8 @@ func prepareMessage(
 		return nil, true
 	}
 
+	content = formatGuildEmojis(content)
+
 	if len(m.Attachments) == 0 && strings.TrimSpace(content) == "" {
 		if reference != nil {
 			actions.SendMessage("Can't reply with an empty message.", s, m)

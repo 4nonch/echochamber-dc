@@ -3,7 +3,9 @@ ifeq ($(wildcard .env), .env)
 	export
 endif
 
-.PHONY: run
+.PHONY: run tests
 
 run:
 	go run ./src/*.go
+tests:
+	go test ./src/...
