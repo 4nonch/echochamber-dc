@@ -20,7 +20,7 @@ func CouldViewChannel(s *discordgo.Session, m *discordgo.MessageCreate) bool {
 	}
 
 	perms, err := actions.GetChannelPermissions(s, m.Author.ID)
-	if err == nil {
+	if err != nil {
 		msg := fmt.Sprintf("Unable to get user's permissions for channel \"%s\": %v", vars.ChannelID, err)
 		log.Printf(msg)
 		return false
