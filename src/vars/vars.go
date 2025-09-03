@@ -20,7 +20,6 @@ var (
 	MaxMessageChars     = getEnvInt("MAX_MESSAGE_CHARS", 1800)
 	MaxAttachmentsBytes = getEnvInt("MAX_ATTACHMENTS_BYTES", 10485760)
 	MaxAttachmentsCount = getEnvInt("MAX_ATTACHMENTS_COUNT", 10)
-	MaxEmojiChars       = getEnvInt("MAX_EMOJI_CHARS", 32)
 )
 
 var (
