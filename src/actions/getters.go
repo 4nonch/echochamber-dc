@@ -1,7 +1,6 @@
 package actions
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -49,7 +48,7 @@ func GetChannelPermissions(s *discordgo.Session, userID string) (int64, error) {
 	return perms, err
 }
 
-// Used to fetch attachment bodies.
+// GetAttachments is used to fetch attachment bodies.
 // If success, don't forget to close the body after use (StreamFiles.Close)
 func GetAttachments(attachments []*discordgo.MessageAttachment) (StreamFiles, chan error) {
 	var wg sync.WaitGroup
@@ -64,14 +63,15 @@ func GetAttachments(attachments []*discordgo.MessageAttachment) (StreamFiles, ch
 		go func(i int, a *discordgo.MessageAttachment) {
 			defer wg.Done()
 			res, err := vars.Client.Get(a.URL)
-
 			if err != nil {
 				errChan <- err
 				return
 			}
 			if res.StatusCode != http.StatusOK {
-				res.Body.Close()
-				errChan <- errors.New(fmt.Sprintf("Failed to fetch %s, status code: %d", a.URL, res.StatusCode))
+				if err := res.Body.Close(); err != nil {
+					log.Printf("Warning: Failed to close response body. Error: %v", err)
+				}
+				errChan <- fmt.Errorf("failed to fetch %s, status code: %d", a.URL, res.StatusCode)
 				return
 			}
 

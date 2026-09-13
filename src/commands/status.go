@@ -57,7 +57,7 @@ func onStatusCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	guild, err := actions.GetGuild(s)
 	if err != nil {
 		message := fmt.Sprintf("Unable to query guild \"%s\": %v", vars.GuildID, err)
-		log.Printf(message)
+		log.Println(message)
 		actions.SendInteractionMessage(message, s, i)
 		return
 	}
@@ -65,7 +65,7 @@ func onStatusCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	channel, err := actions.GetChannel(s)
 	if err != nil {
 		message := fmt.Sprintf("Unable to query channel \"%s\": %v", vars.ChannelID, err)
-		log.Printf(message)
+		log.Println(message)
 		actions.SendInteractionMessage(message, s, i)
 		return
 	}
@@ -73,7 +73,7 @@ func onStatusCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	member, err := actions.GetGuildMember(s, i.User.ID)
 	if err != nil {
 		message := fmt.Sprintf("Unable to get user's status, guild \"%s\": %v", vars.ChannelID, err)
-		log.Printf(message)
+		log.Println(message)
 		actions.SendInteractionMessage(message, s, i)
 		return
 	}

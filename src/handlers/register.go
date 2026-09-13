@@ -1,3 +1,4 @@
+// Package handlers provides various hook to run specific logic upon discord triggers
 package handlers
 
 import "github.com/bwmarrin/discordgo"

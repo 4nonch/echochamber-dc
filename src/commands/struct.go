@@ -1,3 +1,4 @@
+// Package commands contains available bot commands for further registration
 package commands
 
 import "github.com/bwmarrin/discordgo"

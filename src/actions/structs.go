@@ -1,7 +1,9 @@
+// Package actions provides helper functions to use discord / discordgo API
 package actions
 
 import (
 	"io"
+	"log"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -13,6 +15,9 @@ type StreamFiles struct {
 
 func (f *StreamFiles) Close() {
 	for _, file := range f.Resps {
-		file.Close()
+		err := file.Close()
+		if err != nil {
+			log.Printf("Warning: Failed to close file. Error: %v", err)
+		}
 	}
 }

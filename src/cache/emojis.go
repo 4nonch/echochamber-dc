@@ -1,3 +1,4 @@
+// Package cache provides functionality for caching some data to avoid unnecessary API hits
 package cache
 
 import (
@@ -7,7 +8,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// We'll keep cache of guild's emojis and will update them at GuildEmojisUpdate/Ready events
+// Emojis keep cache of guild's emojis and will update them at GuildEmojisUpdate/Ready events
 var Emojis = guildEmojis{}
 
 type guildEmojis struct {

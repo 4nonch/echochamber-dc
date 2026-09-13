@@ -1,3 +1,4 @@
+// Package bot provides entry point for initializing bot application
 package bot
 
 import (
@@ -16,7 +17,7 @@ type Bot struct {
 	registeredCommands []*discordgo.ApplicationCommand
 }
 
-// Initializes bot instance and applies the required configurations
+// NewBot initializes bot instance and applies the required configurations
 func NewBot() *Bot {
 	session, err := discordgo.New("Bot " + vars.BotToken)
 	if err != nil {
@@ -41,7 +42,7 @@ func NewBot() *Bot {
 	return bot
 }
 
-// Opens websocket connection to Discord
+// Start opens web socket connection to Discord
 func (b *Bot) Start() {
 	err := b.session.Open()
 	if err != nil {
@@ -50,7 +51,9 @@ func (b *Bot) Start() {
 
 	b.registeredCommands = make([]*discordgo.ApplicationCommand, len(commands.All))
 	for i, c := range commands.All {
-		registered, err := b.session.ApplicationCommandCreate(b.session.State.User.ID, "", c.Command)
+		registered, err := b.session.ApplicationCommandCreate(
+			b.session.State.User.ID, "", c.Command,
+		)
 		if err != nil {
 			log.Panicf("Failed to register command \"%v\": %v", c.Command.Name, err)
 		}
@@ -58,12 +61,16 @@ func (b *Bot) Start() {
 	}
 }
 
-// Closes websocket connection to Discord
+// Close closes web socket connection to Discord
 func (b *Bot) Close() {
 	log.Println("Shutting down...")
-	b.session.Close()
+	if err := b.session.Close(); err != nil {
+		log.Panicf("Failed to close bot session: %v", err)
+	}
 	for _, c := range b.registeredCommands {
-		err := b.session.ApplicationCommandDelete(b.session.State.User.ID, "", c.ID)
+		err := b.session.ApplicationCommandDelete(
+			b.session.State.User.ID, "", c.ID,
+		)
 		if err != nil {
 			log.Panicf("Failed to delete command \"%v\": %v", c.Name, err)
 		}
@@ -72,7 +79,7 @@ func (b *Bot) Close() {
 	log.Println("Shut down completed.")
 }
 
-// Instructs the current process to wait for future events from Discord.
+// Await instructs the current process to wait for future events from Discord.
 // Handles the user's interrupt signal to stop processing when it occurs.
 func (b *Bot) Await() {
 	stop := make(chan os.Signal, 1)
