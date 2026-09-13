@@ -1,3 +1,4 @@
+// Package vars provides project variables
 package vars
 
 import (
@@ -23,10 +24,10 @@ var (
 )
 
 var (
-	// Proxy, if you'd need it
-	proxyUrl = parseUrl(getEnv("PROXY_URL", ""))
+	// Proxy, if you need it
+	proxyURL = parseURL(getEnv("PROXY_URL", ""))
 	// Default HTTP client
-	Client = getHttpClient()
+	Client = getHTTPClient()
 	// Default websocket dialer
 	Dialer = getWebsocketDialer()
 )
@@ -60,7 +61,7 @@ func getEnvInt(lookup string, defaultValue ...int) int {
 	return value
 }
 
-func parseUrl(u string) *url.URL {
+func parseURL(u string) *url.URL {
 	if u == "" {
 		return nil
 	}
@@ -75,22 +76,22 @@ func parseUrl(u string) *url.URL {
 	return r
 }
 
-func getHttpClient() *http.Client {
-	if proxyUrl == nil {
+func getHTTPClient() *http.Client {
+	if proxyURL == nil {
 		return http.DefaultClient
 	}
 	return &http.Client{
 		Transport: &http.Transport{
-			Proxy: http.ProxyURL(proxyUrl),
+			Proxy: http.ProxyURL(proxyURL),
 		},
 	}
 }
 
 func getWebsocketDialer() *websocket.Dialer {
-	if proxyUrl == nil {
+	if proxyURL == nil {
 		return websocket.DefaultDialer
 	}
 	return &websocket.Dialer{
-		Proxy: http.ProxyURL(proxyUrl),
+		Proxy: http.ProxyURL(proxyURL),
 	}
 }

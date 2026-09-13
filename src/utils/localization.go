@@ -1,3 +1,4 @@
+// Package utils provides various helpers
 package utils
 
 import (
@@ -11,18 +12,18 @@ type Localization struct {
 
 type LocaleMap map[discordgo.Locale]string
 
-const DEFAULT_LOCALE discordgo.Locale = "_"
+const DefaultLocale discordgo.Locale = "_"
 
 func GetLocalized(m LocaleMap, l discordgo.Locale) string {
 	if value, ok := m[l]; ok {
 		return value
 	}
-	return m[DEFAULT_LOCALE]
+	return m[DefaultLocale]
 }
 
 func MakeLocaleMap(original string, options ...*Localization) LocaleMap {
 	localeMap := make(LocaleMap, len(options)+1)
-	localeMap[DEFAULT_LOCALE] = original
+	localeMap[DefaultLocale] = original
 
 	for _, loc := range options {
 		localeMap[loc.Loc] = loc.Msg

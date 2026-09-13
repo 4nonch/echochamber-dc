@@ -1,9 +1,8 @@
+// Package patterns provides various regular expressions
 package patterns
 
 import (
 	"regexp"
 )
 
-var (
-	MessageLink = regexp.MustCompile(`^https://discord\.com/channels/(\d+)/(\d+)/(\d+)$`)
-)
+var MessageLink = regexp.MustCompile(`^https://discord\.com/channels/(\d+)/(\d+)/(\d+)$`)

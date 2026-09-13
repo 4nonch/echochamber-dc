@@ -1,3 +1,4 @@
+// Package services provides various hook to run specific logic upon discord triggers
 package services
 
 import (
@@ -11,7 +12,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// If you're owner - skip check.
+// CouldViewChannel checks channel rights. If you're owner - skip check.
 // Be aware of setting misleading ChannelID, since it won't be checked if you're the owner.
 func CouldViewChannel(s *discordgo.Session, m *discordgo.MessageCreate) bool {
 	guild, err := s.State.Guild(vars.GuildID)
@@ -22,7 +23,7 @@ func CouldViewChannel(s *discordgo.Session, m *discordgo.MessageCreate) bool {
 	perms, err := actions.GetChannelPermissions(s, m.Author.ID)
 	if err != nil {
 		msg := fmt.Sprintf("Unable to get user's permissions for channel \"%s\": %v", vars.ChannelID, err)
-		log.Printf(msg)
+		log.Print(msg)
 		return false
 	}
 

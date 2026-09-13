@@ -34,10 +34,10 @@ func extractReference(m *discordgo.MessageCreate) (*discordgo.MessageReference, 
 	messageID := matches[3]
 
 	if guildID != vars.GuildID {
-		return nil, "", errors.New("Replied message lives on different guild.")
+		return nil, "", errors.New("replied message lives on different guild")
 	}
 	if channelID != vars.ChannelID {
-		return nil, "", errors.New("Replied message lives on different guild's channel.")
+		return nil, "", errors.New("replied message lives on different guild's channel")
 	}
 
 	c = c[len(link):]
